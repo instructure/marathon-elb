@@ -46,7 +46,7 @@ class App {
       const instances = ld.flatMap((resp.Reservations || []), (r) => r.Instances || [])
       const targets = instances.map((instance) => {
         const Host = instance.PrivateIpAddress
-        const Port = portsByHost[Host].port
+        const Port = (portsByHost[Host] || {}).port
         const Id = instance.InstanceId
         return {Id, Port}
       }).filter((i) => (i !== null && i.Port && i.Id))
