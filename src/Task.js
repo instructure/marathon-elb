@@ -7,12 +7,15 @@ class Task {
   get ports() {
     return this._j.ports || []
   }
+  get port() {
+    return this.ports[this._portIndex] || 0
+  }
   get host() {
     return this._j.host
   }
 
   isValid() {
-    return this.ports[this._portIndex] > 0 && !!this.host
+    return this.port > 0 && !!this.host
   }
 }
 module.exports = Task

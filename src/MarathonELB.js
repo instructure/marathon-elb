@@ -28,14 +28,16 @@ class MarathonELB extends EventEmitter {
     for (let et in events) {
       this.es.addEventListener(et, this.onEvent.bind(this, et))
     }
-    this.update((err) => {
-      this.logger.info('ran initial update')
+    this.update((err, res) => {
+      if (err) return cb(err)
+      this.logger.info({status: res}, 'ran initial update')
       if (this.config.pollInterval) {
         this.logger.info(`pull for updates every ${this.config.pollInterval} milliseconds`)
         this._interval = setInterval(() => {
           this.update()
         }, this.config.pollInterval)
       }
+      cb()
     })
   }
 
@@ -65,9 +67,11 @@ class MarathonELB extends EventEmitter {
     })
   }
   getApps(cb) {
-    this._marathon.apps.getList({embed: 'apps.task'})
+    this._marathon.apps.getList({embed: 'apps.tasks'})
     .then((data) => {
-      const apps = data.apps.map((app) => new App(app, this.config))
+      const apps = data.apps
+        .map((app) => new App(app, this.config))
+        .filter((app) => app.isMelbApp())
       cb(null, apps)
     })
     .catch(cb)

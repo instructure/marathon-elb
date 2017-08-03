@@ -25,7 +25,7 @@ class ELBUpdater {
 
       if (toRemove.length === 0) return cb()
       this._elb.deregisterTargets({
-        TargetGroupArn: this.targetArn,
+        TargetGroupArn: targetArn,
         Targets: toRemove
       }, cb)
     })
@@ -33,7 +33,7 @@ class ELBUpdater {
 
   updateTargets(targetArn, targets, cb) {
     this._elb.registerTargets({
-      TargetGroupArn: this.targetArn,
+      TargetGroupArn: targetArn,
       Targets: targets
     }, cb)
   }

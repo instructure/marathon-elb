@@ -13,10 +13,10 @@ class App {
     return this._j.labels || {}
   }
   get targetArn() {
-    return labels[App.TARGET_LABEL]
+    return this.labels[App.TARGET_LABEL]
   }
   get portIndex() {
-    return labels[App.PORT_INDEX_LABEL] || 0
+    return this.labels[App.PORT_INDEX_LABEL] || 0
   }
   get tasks() {
     if (this._tasks) return this._tasks
@@ -28,13 +28,13 @@ class App {
   }
 
   buildTasks() {
-    return taskJson.map((tj) => {
+    return this.taskJson.map((tj) => {
       return new Task(tj, this.portIndex, this.config)
     }).filter((t) => t.isValid())
   }
 
   isMelbApp() {
-    return !!this.targetArn && !!this.port
+    return !!this.targetArn
   }
 
   getTargets(cb) {
@@ -46,7 +46,7 @@ class App {
       const instances = ld.flatMap((resp.Reservations || []), (r) => r.Instances || [])
       const targets = instances.map((instance) => {
         const Host = instance.PrivateIpAddress
-        const Port = portsByHost[host]
+        const Port = portsByHost[Host].port
         const Id = instance.InstanceId
         return {Id, Port}
       }).filter((i) => (i !== null && i.Port && i.Id))

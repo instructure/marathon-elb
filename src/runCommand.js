@@ -19,7 +19,12 @@ exports.handler = (argv) => {
   melb.start((err) => {
     if (err) throw err
 
-    process.on('SIGINT', () => melb.stop())
-    process.on('SIGTERM', () => melb.stop())
+    function stop() {
+      console.log('stopping')
+      melb.stop()
+      process.nextTick(() => process.exit())
+    }
+    process.on('SIGINT', stop)
+    process.on('SIGTERM', stop)
   })
 }
