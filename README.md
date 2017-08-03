@@ -23,3 +23,11 @@ Instead of needing to deal with this repo, you can just use the docker image
 
 ## Deploying to docker
 run `./buildDocker.sh`. This requires `jq` tool
+
+## Roadmap
+This is pretty bare bones, should be relatively easy to make this a lot nicer, some ideas:
+
+- Configure targetGroup health check from marathon info where possible (when it is use an http health check on same port)
+- Dynamically create new target groups with rules, such as hostname based routing. Since a single ELB can now route multiple apps with host based routing this seems doable.
+  The biggest problem is simply that we will have to traverse and match the whole ruleset for an ELB since they don't have names
+- Allow setting other attributes from labels
