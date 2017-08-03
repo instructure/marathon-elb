@@ -1,0 +1,76 @@
+const { EventEmitter } = require('events')
+
+const async = require('async')
+
+const ELBUpdater = require('./ELBUpdater')
+const App = require('./App')
+class MarathonELB extends EventEmitter {
+  constructor(config) {
+    super()
+    this.config = config
+    this._elb = new ELBUpdater(config)
+    this._marathon = config.marathonApi
+    this.logger = this.config.logger
+  }
+
+  start(cb) {
+    this.logger.info('starting marathon-elb')
+    const events = ['status_update_event', 'health_status_changed_event', 'api_post_event']
+    const opts = {
+      eventType: events
+    }
+    this.es = this._marathon.events.createEventSource(opts)
+    this.es.on('open', () => this.logger.info('opened event source'))
+    this.es.on('error', (err) => {
+      this.logger.error({err}, 'error from event source')
+      this.emit('error', err)
+    })
+    for (let et in events) {
+      this.es.addEventListener(et, this.onEvent.bind(this, et))
+    }
+    this.update((err) => {
+      this.logger.info('ran initial update')
+      if (this.config.pollInterval) {
+        this.logger.info(`pull for updates every ${this.config.pollInterval} milliseconds`)
+        this._interval = setInterval(() => {
+          this.update()
+        }, this.config.pollInterval)
+      }
+    })
+  }
+
+  stop() {
+    if (this.es) this.es.close()
+    if (this._interval) clearInterval(this._interval)
+  }
+
+  onEvent(eventName, event) {
+    this.logger.info({eventName, event}, 'handling event')
+    this.update()
+  }
+
+  update(cb) {
+    const self = this
+    cb = cb || function defCb(err, res) {
+      self.logger.error({err}, 'had a fatal error, exiting')
+      if (err) self.emit('error', err)
+      self.emit('updated', res)
+    }
+
+    this.getApps((err, apps) => {
+      if (err) return cb(err)
+      async.map(apps, (app, cb) => {
+        this._elb.updateTarget(app, cb)
+      }, cb)
+    })
+  }
+  getApps(cb) {
+    this._marathon.apps.getList({embed: 'apps.task'})
+    .then((data) => {
+      const apps = data.apps.map((app) => new App(app, this.config))
+      cb(null, apps)
+    })
+    .catch(cb)
+  }
+}
+module.exports = MarathonELB

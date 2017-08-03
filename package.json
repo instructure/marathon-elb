@@ -1,0 +1,31 @@
+{
+  "name": "marathon-alb",
+  "version": "1.0.0",
+  "description": "A tool for syncing marathing with AWS ALBs",
+  "main": "src/",
+  "bin": {
+    "marathon-elb": "./bin/marathon-elb.js"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "marathon",
+    "aws",
+    "alb",
+    "load-balancer"
+  ],
+  "author": "Addison Higham",
+  "license": "MIT",
+  "dependencies": {
+    "async": "^2.5.0",
+    "aws-sdk": "^2.94.0",
+    "bunyan": "^1.8.10",
+    "lodash": "^4.17.4",
+    "marathon-node": "^1.1.0",
+    "yargs": "^8.0.2"
+  },
+  "devDependencies": {
+    "jest": "^20.0.4"
+  }
+}
