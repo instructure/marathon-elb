@@ -54,8 +54,12 @@ class MarathonELB extends EventEmitter {
   update(cb) {
     const self = this
     cb = cb || function defCb(err, res) {
-      self.logger.error({err}, 'had a fatal error, exiting')
-      if (err) self.emit('error', err)
+      if (err) {
+        self.logger.error({err}, 'had a fatal error, exiting')
+        self.emit('error', err)
+        return
+      }
+      self.logger.info({res}, 'ran update')
       self.emit('updated', res)
     }
 
