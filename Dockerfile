@@ -2,7 +2,7 @@ FROM instructure/node:8
 
 ENV MARATHON_URL http://marathon.mesos:8080
 COPY package.json package-lock.json /usr/src/app/
-RUN npm install
+RUN npm install --production
 COPY . /usr/src/app/
 
 WORKDIR /usr/src/app/
