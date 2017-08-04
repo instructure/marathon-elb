@@ -25,7 +25,7 @@ class MarathonELB extends EventEmitter {
       this.logger.error({err}, 'error from event source')
       this.emit('error', err)
     })
-    for (let et in events) {
+    for (let et of events) {
       this.logger.info(`registering for ${et} event`)
       this.es.addEventListener(et, this.onEvent.bind(this, et))
     }
