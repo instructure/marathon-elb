@@ -3,10 +3,10 @@ const valid = {
   ports: [
     1000, 1001
   ],
-  host: '10.0.0.1',
+  host: '10.0.0.1'
 }
 const invalid = {
-  host: '10.0.0.1',
+  host: '10.0.0.1'
 }
 describe('Task', () => {
   describe('isValid', () => {

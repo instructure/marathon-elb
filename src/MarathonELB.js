@@ -26,6 +26,7 @@ class MarathonELB extends EventEmitter {
       this.emit('error', err)
     })
     for (let et in events) {
+      this.logger.info(`registering for ${et} event`)
       this.es.addEventListener(et, this.onEvent.bind(this, et))
     }
     this.update((err, res) => {
@@ -34,6 +35,7 @@ class MarathonELB extends EventEmitter {
       if (this.config.pollInterval) {
         this.logger.info(`pull for updates every ${this.config.pollInterval} milliseconds`)
         this._interval = setInterval(() => {
+          this.logger.info('running perodic update')
           this.update()
         }, this.config.pollInterval)
       }

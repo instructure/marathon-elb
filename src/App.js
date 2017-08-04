@@ -1,4 +1,3 @@
-const async = require('async')
 const ld = require('lodash')
 
 const Task = require('./Task')

@@ -97,7 +97,7 @@ describe('App', () => {
     const app = new App(j, mockConfig)
     it('should return the expected targets', (done) => {
       app.getTargets((err, targets) => {
-        if (err) return cb(err)
+        if (err) return done(err)
         expect(targets).toEqual([
           {
             Id: 'i-1234513413',

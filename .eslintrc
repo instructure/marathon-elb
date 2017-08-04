@@ -1,0 +1,15 @@
+{
+  "env": {
+    "node": true,
+    "es6": true,
+    "mocha": true,
+    "jest" : true
+  },
+  "parserOptions": {
+    "ecmaVersion": 6
+  },
+  "extends": "standard",
+  "rules": {
+    "space-before-function-paren": ["warn", "never"]
+  }
+}
