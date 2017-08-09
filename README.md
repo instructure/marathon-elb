@@ -1,25 +1,53 @@
 Marathon-ELB
 ======
 
-Use an AWS ALB aka application load balancer aka ELBv2 for marathon apps.
+Use an AWS ALB (aka application load balancer aka ELBv2) for marathon apps.
 
-This essentially just follows the marathon event bus and makes calls to AWS apis to keep the ALB in sync
+This essentially just follows the marathon event bus and makes calls to AWS apis to keep the ALB in sync.
 
 ## How to
 1. Create an ALB with a listener configured how you want (such as hostname, rules, etc) as well as a target group
 2. Add a label with `MELB_TARGET_ARN` with the target group arn in your marathon config
-3. Make sure your server has the following permissions:
+3. Make sure you have the following permissions for where marathon-elb will run
   - `ec2:DescribeInstances`
   - `elasticloadbalancing:DeregisterTargets`
   - `elasticloadbalancing:DescribeTargetHealth`
   - `elasticloadbalancing:RegisterTargets`
+4. Deploy this as another app in your marathon, see an example below
+
+## Marathon Config
+
+
+```JSON
+{
+  "id": "marathon-elb",
+  "instances": 1,
+  "cpus": 1,
+  "mem": 256,
+  "maintainer": "",
+  "container": {
+    "type": "DOCKER",
+    "docker": {
+      "image": "instructuredata/marathon-elb:1.0.2",
+      "network": "BRIDGE"
+    }
+  },
+  "env": {
+    "AWS_REGION": "us-east-1",
+    "MARATHON_URL: "http://mymarathonurl"
+  }
+}
+```
+
+`MARATHON_URL` defaults to `http://marathon.mesos:8080`, which is the default name in DC/OS
 
 ## Docker Image
-Instead of needing to deal with this repo, you can just use the docker image
+If you want to run this manually (for testing for example), the following should work
 
-`docker pull instructuredata/marathon-elb:$version`
-`docker run -e AWS_REGION=us-east-1 instructedata/marathon-elb:$version`
-
+```Shell
+docker pull instructuredata/marathon-elb:$version
+docker run -e AWS_REGION=us-east-1 instructedata/marathon-elb:$version
+```
 
 ## Deploying to docker
 run `./buildDocker.sh`. This requires `jq` tool
