@@ -34,7 +34,7 @@ This essentially just follows the marathon event bus and makes calls to AWS apis
   },
   "env": {
     "AWS_REGION": "us-east-1",
-    "MARATHON_URL: "http://mymarathonurl"
+    "MARATHON_URL": "http://mymarathonurl"
   }
 }
 ```
