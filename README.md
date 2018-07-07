@@ -38,6 +38,17 @@ This essentially just follows the marathon event bus and makes calls to AWS apis
       "port": 0
     }
   ],
+  "healthChecks": [
+    {
+      "protocol": "HTTP",
+      "path": "/health",
+      "gracePeriodSeconds": 5,
+      "intervalSeconds": 60,
+      "timeoutSeconds": 10,
+      "maxConsecutiveFailures": 3,
+      "ignoreHttp1xx": false
+    }
+  ],
   "env": {
     "AWS_REGION": "us-east-1",
     "MARATHON_URL": "http://mymarathonurl"
