@@ -1,4 +1,7 @@
 const ld = require('lodash')
+const isIp = require('is-ip')
+const dns = require('dns')
+const async = require('async')
 
 const Task = require('./Task')
 class App {
@@ -36,20 +39,32 @@ class App {
     return !!this.targetArn
   }
 
-  getTargets(cb) {
-    const ipAddrs = this.tasks.map((t) => t.host)
-    const portsByHost = ld.keyBy(this.tasks.map((t) => ({host: t.host, port: t.port})), 'host')
-    if (ipAddrs.length === 0) return cb(null, [])
-    this._ec2.describeInstances(this.buildDescribeParams(ipAddrs), (err, resp) => {
+  ensureIp(task, cb) {
+    if (isIp(task.host)) return cb(null, task)
+    dns.lookup(task.host, (err, addr) => {
       if (err) return cb(err)
-      const instances = ld.flatMap((resp.Reservations || []), (r) => r.Instances || [])
-      const targets = instances.map((instance) => {
-        const Host = instance.PrivateIpAddress
-        const Port = (portsByHost[Host] || {}).port
-        const Id = instance.InstanceId
-        return {Id, Port}
-      }).filter((i) => (i !== null && i.Port && i.Id))
-      cb(null, targets)
+      task.host = addr
+      cb(null, task)
+    })
+  }
+
+  getTargets(cb) {
+    const tasks = this.tasks.map((t) => ({host: t.host, port: t.port}))
+    async.map(tasks, this.ensureIp.bind(this), (err, tasks) => {
+      const ipAddrs = tasks.map((t) => t.host)
+      const portsByHost = ld.keyBy(tasks, 'host')
+      if (ipAddrs.length === 0) return cb(null, [])
+      this._ec2.describeInstances(this.buildDescribeParams(ipAddrs), (err, resp) => {
+        if (err) return cb(err)
+        const instances = ld.flatMap((resp.Reservations || []), (r) => r.Instances || [])
+        const targets = instances.map((instance) => {
+          const Host = instance.PrivateIpAddress
+          const Port = (portsByHost[Host] || {}).port
+          const Id = instance.InstanceId
+          return {Id, Port}
+        }).filter((i) => (i !== null && i.Port && i.Id))
+        cb(null, targets)
+      })
     })
   }
 

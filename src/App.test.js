@@ -44,6 +44,11 @@ describe('App', () => {
       {
         ports: [1000, 1001],
         host: '10.0.0.2'
+      },
+      {
+        ports: [1000, 1001],
+        // this should always return a stable address
+        host: 'dns.msftncsi.com'
       }
     ]
   }
@@ -67,8 +72,8 @@ describe('App', () => {
     })
     it('should get tasks', () => {
       const tasks = app.tasks
-      expect(tasks.length).toBe(2)
-      expect(tasks.map((t) => t.host)).toEqual(['10.0.0.1', '10.0.0.2'])
+      expect(tasks.length).toBe(3)
+      expect(tasks.map((t) => t.host)).toEqual(['10.0.0.1', '10.0.0.2', 'dns.msftncsi.com'])
     })
   })
   describe('isMelbApp', () => {
@@ -98,6 +103,9 @@ describe('App', () => {
     it('should return the expected targets', (done) => {
       app.getTargets((err, targets) => {
         if (err) return done(err)
+        const args = mockEc2.mock.calls[0][0]
+        const addrs = args.Filters[0].Values
+        expect(addrs).toEqual(['10.0.0.1', '10.0.0.2', '131.107.255.255'])
         expect(targets).toEqual([
           {
             Id: 'i-1234513413',
