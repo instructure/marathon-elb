@@ -8,5 +8,6 @@ module.exports = {
   marathonRequestOpts: null, // optional, opts to request lib, defaults to {}, set if you need auth and such
   marathonApi: null, // optional, defaults to new instance of https://github.com/elasticio/marathon-node with opts defined above
   pollInterval: null, // set a poll interval in milliseconds to periodically check, this shouldn't be needed but is a safety net against drift, set to 0 to disable, defaults to 10 minutes
-  vpcId: null // if you have multiple vpcs with overlapping ip ranges, we need to VPC to properly look up instanceIds by ip address, should be the VPC where your marathon is running
+  vpcId: null, // if you have multiple vpcs with overlapping ip ranges, we need to VPC to properly look up instanceIds by ip address, should be the VPC where your marathon is running
+  port: null // the port to listen on for the /health check
 }

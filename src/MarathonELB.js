@@ -3,18 +3,21 @@ const { EventEmitter } = require('events')
 const async = require('async')
 
 const ELBUpdater = require('./ELBUpdater')
+const Server = require('./Server')
 const App = require('./App')
 class MarathonELB extends EventEmitter {
   constructor(config) {
     super()
     this.config = config
     this._elb = new ELBUpdater(config)
+    this._server = new Server(config)
     this._marathon = config.marathonApi
     this.logger = this.config.logger
   }
 
   start(cb) {
     this.logger.info('starting marathon-elb')
+    this._server.start()
     const events = ['status_update_event', 'health_status_changed_event', 'api_post_event']
     const opts = {
       eventType: events
@@ -46,6 +49,7 @@ class MarathonELB extends EventEmitter {
   stop() {
     if (this.es) this.es.close()
     if (this._interval) clearInterval(this._interval)
+    this._server.stop()
   }
 
   onEvent(eventName, event) {

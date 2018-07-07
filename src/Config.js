@@ -60,5 +60,9 @@ class Config {
     if (this.configFile.logger) return this.configFile.logger
     return bunyan.createLogger({name: 'marathon-elb'})
   }
+
+  get serverPort() {
+    return this.configFile.port || 3000
+  }
 }
 module.exports = Config

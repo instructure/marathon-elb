@@ -51,6 +51,7 @@ class App {
   getTargets(cb) {
     const tasks = this.tasks.map((t) => ({host: t.host, port: t.port}))
     async.map(tasks, this.ensureIp.bind(this), (err, tasks) => {
+      if (err) return cb(err)
       const ipAddrs = tasks.map((t) => t.host)
       const portsByHost = ld.keyBy(tasks, 'host')
       if (ipAddrs.length === 0) return cb(null, [])

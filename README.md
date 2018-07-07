@@ -28,10 +28,16 @@ This essentially just follows the marathon event bus and makes calls to AWS apis
   "container": {
     "type": "DOCKER",
     "docker": {
-      "image": "instructuredata/marathon-elb:1.0.2",
+      "image": "instructuredata/marathon-elb:1.1.0",
       "network": "BRIDGE"
     }
   },
+  "portDefinitions": [
+    {
+      "protocol": "tcp",
+      "port": 0
+    }
+  ],
   "env": {
     "AWS_REGION": "us-east-1",
     "MARATHON_URL": "http://mymarathonurl"
