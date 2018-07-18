@@ -33,8 +33,11 @@ class MarathonELB extends EventEmitter {
       this.es.addEventListener(et, this.onEvent.bind(this, et))
     }
     this.update((err, res) => {
-      if (err) return cb(err)
-      this.logger.info({status: res}, 'ran initial update')
+      if (err) {
+        this.onUpdateFail(err)
+      } else {
+        this.logger.info({status: res}, 'ran initial update')
+      }
       if (this.config.pollInterval) {
         this.logger.info(`pull for updates every ${this.config.pollInterval} milliseconds`)
         this._interval = setInterval(() => {
@@ -44,6 +47,12 @@ class MarathonELB extends EventEmitter {
       }
       cb()
     })
+  }
+
+  onUpdateFail(err) {
+    if (err) {
+      this.logger.error(err, 'updating elb failed')
+    }
   }
 
   stop() {
@@ -60,11 +69,8 @@ class MarathonELB extends EventEmitter {
   update(cb) {
     const self = this
     cb = cb || function defCb(err, res) {
-      if (err) {
-        self.logger.error({err}, 'had a fatal error, exiting')
-        self.emit('error', err)
-        return
-      }
+      if (err) return this.onUpdateFail(err)
+
       self.logger.info({res}, 'ran update')
       self.emit('updated', res)
     }
