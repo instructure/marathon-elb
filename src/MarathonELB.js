@@ -69,7 +69,7 @@ class MarathonELB extends EventEmitter {
   update(cb) {
     const self = this
     cb = cb || function defCb(err, res) {
-      if (err) return this.onUpdateFail(err)
+      if (err) return self.onUpdateFail(err)
 
       self.logger.info({res}, 'ran update')
       self.emit('updated', res)
